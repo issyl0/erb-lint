@@ -8,6 +8,7 @@ module ERBLint
 
       class ConfigSchema < LinterConfig
         property :present, accepts: [true, false], default: true, reader: :present?
+        property :excludes, accepts: array_of?(String), default: -> { [] }, reader: :excludes?
       end
       self.config_schema = ConfigSchema
 
@@ -17,6 +18,8 @@ module ERBLint
       end
 
       def run(processed_source)
+        return if @config.excludes_file?(processed_source.filename, @file_loader.base_path)
+
         file_content = processed_source.file_content
 
         return if file_content.empty?
